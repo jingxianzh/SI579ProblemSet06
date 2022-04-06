@@ -98,7 +98,7 @@ function App() {
   return (
     <main className="container">
       <h1 class="row">Rhyme Finder (579 Problem Set 5)</h1>
-      <h2>YOUR GITHUB CODE LINK GOES HERE: https://github.com/jingxianzh/SI579ProblemSet06/</h2>
+      <h2>YOUR GITHUB CODE LINK GOES HERE: https://github.com/jingxianzh/SI579ProblemSet06/tree/main</h2>
       <div className="row">
         <div className="col">Saved words: {saved.join(', ')}</div>
       </div>
