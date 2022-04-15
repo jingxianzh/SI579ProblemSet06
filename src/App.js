@@ -39,7 +39,9 @@ function App() {
   const [saved, setSaved] = useState([]);
   const [searchRhymes, setSearchRhymes] = useState(false);
   const [searchSynonyms, setSearchSynonyms] = useState(false);
-  const [url, setUrl] = useState('')
+  const [url, setUrl] = useState('');
+  const [loading1, setLoading1] = useState();
+  const [loading2, setLoading2] = useState();
 
   const saveWord = (item) => {
     if (saved.includes(item)) return;
@@ -64,14 +66,19 @@ function App() {
   useEffect(() => {
     if (url === '') return
     fetch(url)
+      .then(setSynonyms([]))
+      .then(setLoading2())
+      .then(setLoading1("loading..."))
       .then((response) => response.json())
       .then((data) => {
         if (data.length !== 0) {
-          setSaved([])
+          //setSaved([])
           data = groupBy(data, 'numSyllables'); //object
           setRhyme({ ...data })
-          setSynonyms([])
         }
+        else {
+          setRhyme(['no results']) }
+        setLoading1("done")
       }, (err) => {
         console.error(err);
       })
@@ -83,17 +90,34 @@ function App() {
   useEffect(() => {
     if (url === '') return
     fetch(url)
+      .then(setRhyme({}))
+      .then(setLoading1())
+      .then(setLoading2("loading..."))
       .then((response) => response.json())
       .then((data) => {
+        console.log(data)
         if (data.length !== 0) {
-          setSaved([])
-          setRhyme({})
+          //setSaved([]) 
           setSynonyms([...data]) //array
         }
+        else {
+          setSynonyms(['no results']) }
+        setLoading2("done")
       }, (err) => {
         console.error(err);
       })
   }, [searchSynonyms])
+
+  const handleEnter = e => {
+    // const handleKeyDown = (event) => {
+    if (e.key === 'Enter') {
+      const url1 = 'https://api.datamuse.com/words?rel_rhy=' + search
+      setUrl(url1)
+      setSearchRhymes(~searchRhymes)
+    }
+  }
+
+  // return <input type="text" onKeyDown={handleKeyDown} />
 
   return (
     <main className="container">
@@ -109,18 +133,21 @@ function App() {
             type="text"
             placeholder="Enter a word"
             value={search}
-            onChange={e => setSearch(e.target.value)} />
+            onChange={e => setSearch(e.target.value)}
+            onKeyDown={(e) => { handleEnter(e) }} />
           <button type="button" className="btn btn-primary" onClick={() => { handleSearch('rhyme') }}>Show rhyming words</button>
           <button type="button" className="btn btn-secondary" onClick={() => { handleSearch('synonyms') }}>Show synonyms</button>
         </div>
       </div>
-      <div className="row">
+      {/* <div className="row">
         <h2 className="col" ></h2>
-      </div>
+      </div> */}
       <div className="output row">
         <output className="col">
-          <Rhyme rhyme={rhyme} saveWord={saveWord}></Rhyme>
-          <Synonyms synonyms={synonyms} saveWord={saveWord}></Synonyms>
+
+
+          <Rhyme rhyme={rhyme} saveWord={saveWord} loading={loading1} word={search}></Rhyme>
+          <Synonyms synonyms={synonyms} saveWord={saveWord} loading={loading2} word={search}></Synonyms>
         </output>
       </div>
     </main>
